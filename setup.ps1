@@ -11,6 +11,13 @@ if (-not (Get-Command python -ErrorAction SilentlyContinue)) {
 }
 
 $dest = "$HOME\adaptive-ai-command-center"
+# Stop any previous server still running, or its locked files can't be replaced
+$oldServer = Get-NetTCPConnection -LocalPort 8001 -ErrorAction SilentlyContinue | Select-Object -First 1
+if ($oldServer) {
+  Write-Host "Stopping the previous server..."
+  Stop-Process -Id $oldServer.OwningProcess -Force -ErrorAction SilentlyContinue
+  Start-Sleep 2
+}
 if (Test-Path $dest) { Write-Host "Removing old copy..."; Remove-Item -Recurse -Force $dest }
 Write-Host "Downloading the app..."
 $zip = "$env:TEMP\cc.zip"

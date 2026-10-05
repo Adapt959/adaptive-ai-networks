@@ -10,6 +10,15 @@ if ! command -v python3 >/dev/null 2>&1; then
 fi
 
 cd "$HOME"
+# Stop any previous server still running, or its locked files can't be replaced
+if command -v lsof >/dev/null 2>&1; then
+  old_pid=$(lsof -ti:8001 2>/dev/null | head -1)
+  if [ -n "$old_pid" ]; then
+    echo "Stopping the previous server..."
+    kill "$old_pid" 2>/dev/null || true
+    sleep 2
+  fi
+fi
 if [ -d "adaptive-ai-command-center" ]; then
   echo "Removing old copy..."
   rm -rf adaptive-ai-command-center
